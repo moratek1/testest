@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dictionary from GitHub CSV</title>
+</head>
+<body>
+<div id="dictionary"></div>
+
+<script>
+async function fetchCSVFromGitHub(url) {
+  const response = await fetch(url);
+  const csvText = await response.text();
+  return csvText;
+}
+
+function parseCSV(csvText) {
+  const lines = csvText.split('\n');
+  // Skipping the header row and any empty line at the end
+  return lines.slice(1, -1).map(line => {
+    const [word, definition, partOfSpeech] = line.split(',');
+    return { word, definition, partOfSpeech };
+  });
+}
+
+function displayDictionaryEntries(entries) {
+  const dictionaryElement = document.getElementById('dictionary');
+  entries.forEach(({ word, definition, partOfSpeech }) => {
+    const entryElement = document.createElement('div');
+    entryElement.innerHTML = `<h3>${word} (${partOfSpeech})</h3><p>${definition}</p>`;
+    dictionaryElement.appendChild(entryElement);
+  });
+}
+
+// Replace the URL with the raw content URL of your CSV file in GitHub
+const csvUrl = 'https://raw.githubusercontent.com/yourusername/yourrepository/main/yourfile.csv';
+
+fetchCSVFromGitHub(csvUrl)
+  .then(parseCSV)
+  .then(displayDictionaryEntries);
+</script>
+</body>
+</html>
